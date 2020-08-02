@@ -1,0 +1,158 @@
+import java.util.Scanner; 
+import java.io.File;
+import java.io.FileNotFoundException;
+
+
+/** 
+ * Title: Assignment 5 
+ * Semester: COP3337 – Fall 2019
+ * @author Megan Jane Thompson
+ *
+ * I affirm that this program is entirely my own work
+ * and none of it is the work of any other person.
+ * 
+ * This program calculates daily transactions in a text file. 
+ * It calculates if the actual amount of cash at the end of 
+ * the day equals the expected value.
+ */
+public class BalanceTransactions{
+  private Scanner keyboard = new Scanner(System.in);
+  private Scanner fileReader;
+  private double todaysTrans;
+  
+  
+  public String getFileName(){
+    String fileName = "";
+    
+    System.out.println("Enter file name: ");
+    if (keyboard.hasNext()){
+      fileName = keyboard.next();
+    }
+    
+    return fileName;
+  }
+  
+  
+  
+  
+  public void openFile(String fileName){
+    try{
+      fileReader = new Scanner(new File(fileName));
+    }
+    catch(FileNotFoundException exception){
+      System.out.print("File not found. ");
+    }
+  }
+
+  
+
+  
+  public void readFile(){
+    while (fileReader == null){
+      openFile(getFileName());
+    }
+    while(fileReader.hasNext()){
+      String invoice = fileReader.next();
+      String amount = fileReader.next();
+      String type = fileReader.next();
+      
+      todaysTrans = todaysTrans + transactionsBalance(invoice, amount, type);
+    }
+  }
+  
+  
+  
+  
+  public double transactionsBalance(String invoiceVal, String amountVal, String typeVal){
+    double transactionAmount = Double.parseDouble(amountVal);
+    double amount = 0.0;
+    
+    if (typeVal.equals("P") || typeVal.equals("p")){
+      amount = -transactionAmount;
+    }
+    else{
+      amount = transactionAmount;
+    }
+    
+    return amount;
+  }
+  
+  
+  
+  
+  public void calculateBal(double beginBal, double endingBal){
+    double finalBal = beginBal + todaysTrans;
+    
+    if (Math.abs(finalBal - endingBal) < .01){
+      System.out.println("Transactions are balanced!");
+    }
+    else{
+      System.out.println("Transactions are not balanced.");
+    }
+    
+  }
+  
+  
+  
+  
+  public double getBeginBal(){
+    double beginningBal = 0.0;
+    String line = keyboard.nextLine();
+    System.out.println("Enter beginning of day balance: ");
+    if(!keyboard.hasNextDouble()){
+      System.out.print("Invalid entry. Please enter beginning of day balance. ");
+      getBeginBal();
+      if(keyboard.hasNextDouble()){
+        beginningBal = keyboard.nextDouble();
+      }
+    }
+    else if(keyboard.hasNextDouble()){
+      beginningBal = keyboard.nextDouble();
+    }
+
+    return beginningBal;
+  }
+  
+  
+  
+  
+    public double getEndBal(){
+    double endingBal = 0.0;
+    String line = keyboard.nextLine();
+    System.out.println("Enter end of day balance: ");
+    if(!keyboard.hasNextDouble()){
+      System.out.print("Invalid entry. Please enter end of day balance. ");
+      getEndBal();
+      if(keyboard.hasNextDouble()){
+        endingBal = keyboard.nextDouble();
+      }
+    }
+    else if(keyboard.hasNextDouble()){
+      endingBal = keyboard.nextDouble();
+    }
+
+    return endingBal;
+  }
+  
+  
+  
+  
+  public void closeFile() {
+    fileReader.close();
+  }
+  
+  
+  
+  
+  public static void main(String[] args){
+    BalanceTransactions balTran = new BalanceTransactions();
+    balTran.openFile(balTran.getFileName());
+    balTran.readFile();
+    double beginBal = balTran.getBeginBal();
+    double endBal = balTran.getEndBal();
+    balTran.calculateBal(beginBal, endBal);
+    balTran.closeFile();
+    
+  }
+  
+}
